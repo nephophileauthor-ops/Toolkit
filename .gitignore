@@ -1,0 +1,21 @@
+# Android / Gradle
+.gradle/
+build/
+*/build/
+app/.cxx/
+local.properties
+
+# Local Gradle distribution bundled in workspace
+gradle-8.7/
+gradle-8.7-bin.zip
+
+# Native bridge outputs
+app/src/main/go/tunbridge/build/
+app/src/main/jniLibs/arm64-v8a/libtunbridge.so
+app/src/main/jniLibs/x86_64/libtunbridge.so
+
+# IDE / OS
+.idea/
+*.iml
+Thumbs.db
+.DS_Store

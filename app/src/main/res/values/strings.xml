@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">API Debug Inspector</string>
+    <string name="capture_channel_name">Capture Sessions</string>
+    <string name="capture_channel_description">Shows active local capture sessions for API Debug Inspector.</string>
+    <string name="vpn_channel_name">VPN Capture</string>
+    <string name="vpn_channel_description">Local VPN capture session for traffic observation and future proxy routing.</string>
+</resources>

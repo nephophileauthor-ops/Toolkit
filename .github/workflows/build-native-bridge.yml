@@ -1,0 +1,85 @@
+name: Build Native Bridge
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - ".github/workflows/build-native-bridge.yml"
+      - "app/src/main/cpp/**"
+      - "app/src/main/go/tunbridge/**"
+      - "app/src/main/java/com/apidebug/inspector/nativebridge/**"
+      - "app/src/main/java/com/apidebug/inspector/capture/**"
+      - "app/build.gradle.kts"
+      - "build.gradle.kts"
+      - "settings.gradle.kts"
+      - "gradlew"
+      - "gradlew.bat"
+      - "gradle/wrapper/**"
+      - "docs/native-tun-bridge.md"
+
+permissions:
+  contents: read
+
+jobs:
+  build-native-bridge:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.22.5"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "gradle"
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
+        run: sdkmanager "ndk;25.2.9519653"
+
+      - name: Build Go bridge
+        run: |
+          chmod +x app/src/main/go/tunbridge/build-android.sh
+          ANDROID_NDK_HOME="$ANDROID_SDK_ROOT/ndk/25.2.9519653" \
+          app/src/main/go/tunbridge/build-android.sh
+
+      - name: Sync Go bridge into Android app
+        run: |
+          chmod +x app/src/main/go/tunbridge/sync-native-bridge.sh
+          app/src/main/go/tunbridge/sync-native-bridge.sh
+
+      - name: Build debug APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon assembleDebug
+
+      - name: Prepare artifact layout
+        run: |
+          mkdir -p native-bridge-bundle/jniLibs/arm64-v8a
+          mkdir -p native-bridge-bundle/jniLibs/x86_64
+          mkdir -p native-bridge-bundle/cpp/include
+          mkdir -p native-bridge-bundle/apk/debug
+          cp app/src/main/go/tunbridge/build/android/arm64-v8a/libtunbridge.so native-bridge-bundle/jniLibs/arm64-v8a/libtunbridge.so
+          cp app/src/main/go/tunbridge/build/android/x86_64/libtunbridge.so native-bridge-bundle/jniLibs/x86_64/libtunbridge.so
+          cp app/src/main/go/tunbridge/build/android/arm64-v8a/libtunbridge.h native-bridge-bundle/cpp/include/tunbridge.h
+          cp app/build/outputs/apk/debug/app-debug.apk native-bridge-bundle/apk/debug/app-debug.apk
+          cp docs/native-tun-bridge.md native-bridge-bundle/README-native-tun-bridge.md
+
+      - name: Upload native bridge artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-bridge-bundle
+          path: native-bridge-bundle
+          if-no-files-found: error
