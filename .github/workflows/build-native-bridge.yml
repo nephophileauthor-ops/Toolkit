@@ -52,6 +52,9 @@ jobs:
       - name: Build Go bridge
         run: |
           chmod +x app/src/main/go/tunbridge/build-android.sh
+          cd app/src/main/go/tunbridge
+          go mod download
+          cd "$GITHUB_WORKSPACE"
           ANDROID_NDK_HOME="$ANDROID_SDK_ROOT/ndk/25.2.9519653" \
           app/src/main/go/tunbridge/build-android.sh
 
