@@ -36,7 +36,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v6
         with:
-          go-version: "1.22.5"
+          go-version: "1.24.1"
           cache-dependency-path: app/src/main/go/tunbridge/go.mod
 
       - name: Set up JDK 17
