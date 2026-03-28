@@ -5,6 +5,7 @@
 
 typedef bool (*protect_socket_cb)(int);
 
-bool callProtectSocket(protect_socket_cb cb, int fd);
+void tunbridge_set_protect_callback(protect_socket_cb cb);
+bool tunbridge_call_protect_socket(int fd);
 
 #endif

@@ -48,14 +48,8 @@ type bridgeEngine struct {
 }
 
 var (
-	engine          = &bridgeEngine{}
-	protectCallback C.protect_socket_cb
+	engine = &bridgeEngine{}
 )
-
-//export tunbridge_set_protect_callback
-func tunbridge_set_protect_callback(cb C.protect_socket_cb) {
-	protectCallback = cb
-}
 
 //export tunbridge_start
 func tunbridge_start(
@@ -309,10 +303,7 @@ func protectControlFn(_, _ string, rawConn syscall.RawConn) error {
 	}
 
 	controlErr := rawConn.Control(func(fd uintptr) {
-		if protectCallback == nil {
-			return
-		}
-		if ok := C.callProtectSocket(protectCallback, C.int(fd)); ok == C.bool(0) {
+		if ok := C.tunbridge_call_protect_socket(C.int(fd)); ok == C.bool(0) {
 			protectErr = fmt.Errorf("VpnService.protect failed for fd %d", fd)
 		}
 	})
