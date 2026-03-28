@@ -1,16 +1,7 @@
 package main
 
 /*
-#include <stdbool.h>
-
-typedef bool (*protect_socket_cb)(int);
-
-static inline bool callProtectSocket(protect_socket_cb cb, int fd) {
-	if (cb == NULL) {
-		return false;
-	}
-	return cb(fd);
-}
+#include "bridge.h"
 */
 import "C"
 
